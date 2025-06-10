@@ -1,4 +1,3 @@
-// components/PinterestGallery.js
 "use client";
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
@@ -7,91 +6,25 @@ import { XCircle } from 'lucide-react';
 import Masonry from 'react-masonry-css';
 
 const galleryItems = [
-  {
-    id: 1,
-    type: 'image',
-    src: '/work3.jpg',
-    aspectRatio: '16/9',
-  },
-  {
-    id: 2,
-    type: 'video',
-    src: '/work1.mp4',
-    aspectRatio: '9/16',
-  }, 
-  {
-    id: 3,
-    type: 'image',
-    src: '/work4.jpg',
-    aspectRatio: '3/4',
-  },
-  {
-    id: 4,
-    type: 'video',
-    src: '/work8.mp4',
-    aspectRatio: '9/16',
-  },
-  {
-    id: 5,
-    type: 'image',
-    src: '/work5.jpg',
-    aspectRatio: '4/3',
-  },
-  {
-    id: 6,
-    type: 'video',
-    src: '/work2.mp4',
-    aspectRatio: '9/16',
-  },
-  {
-    id: 7,
-    type: 'image',
-    src: '/work9.jpg',
-    aspectRatio: '4/3',
-  }, 
-  {
-    id: 8,
-    type: 'image',
-    src: '/work11.jpg',
-    aspectRatio: '2/3',
-  },
-  {
-    id: 9,
-    type: 'video',
-    src: '/work7.mp4',
-    aspectRatio: '9/16',
-  },
-  {
-    id: 10,
-    type: 'image',
-    src: '/work10.jpg',
-    aspectRatio: '3/2',
-  },
-  {
-    id: 11,
-    type: 'video',
-    src: '/work6.mp4',
-    aspectRatio: '9/16',
-  },
-  {
-    id: 12,
-    type: 'image',
-    src: '/work12.jpg',
-    aspectRatio: '3/2',
-  },
-  {
-    id: 13,
-    type: 'image',
-    src: '/work13.jpg',
-    aspectRatio: '3/2',
-  },
+  { id: 1, type: 'image', src: '/work3.jpg', aspectRatio: '16/9' },
+  { id: 2, type: 'video', src: '/work1.mp4', aspectRatio: '9/16' },
+  { id: 3, type: 'image', src: '/work4.jpg', aspectRatio: '3/4' },
+  { id: 4, type: 'video', src: '/work8.mp4', aspectRatio: '9/16' },
+  { id: 5, type: 'image', src: '/work5.jpg', aspectRatio: '4/3' },
+  { id: 6, type: 'video', src: '/work2.mp4', aspectRatio: '9/16' },
+  { id: 7, type: 'image', src: '/work9.jpg', aspectRatio: '4/3' },
+  { id: 8, type: 'image', src: '/work11.jpg', aspectRatio: '2/3' },
+  { id: 9, type: 'video', src: '/work7.mp4', aspectRatio: '9/16' },
+  { id: 10, type: 'image', src: '/work10.jpg', aspectRatio: '3/2' },
+  { id: 11, type: 'video', src: '/work6.mp4', aspectRatio: '9/16' },
+  { id: 12, type: 'image', src: '/work12.jpg', aspectRatio: '3/2' },
+  { id: 13, type: 'image', src: '/work13.jpg', aspectRatio: '3/2' },
 ];
 
-// Optimized breakpoint columns for responsive design
 const breakpointCols = {
-  default: 4,    // 4 columns for large screens (1024px and up)
-  1024: 3,       // 3 columns for medium screens (768px - 1023px)
-  640: 2,        // 2 columns for small screens (below 640px)
+  default: 4,
+  1024: 3,
+  640: 2,
 };
 
 export default function Mywork() {
@@ -101,7 +34,7 @@ export default function Mywork() {
   const openZoom = useCallback((item) => {
     setZoomedItem(item);
     document.body.style.overflow = 'hidden';
-    Object.values(videoRefs.current).forEach(videoEl => {
+    Object.values(videoRefs.current).forEach((videoEl) => {
       if (videoEl && videoEl.id !== `video-${item.id}`) {
         videoEl.pause();
       }
@@ -133,13 +66,17 @@ export default function Mywork() {
   }, [zoomedItem, closeZoom]);
 
   useEffect(() => {
+    const currentRefs = { ...videoRefs.current }; // ✅ Snapshot
+
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          const videoElement = videoRefs.current[entry.target.id];
+          const videoElement = currentRefs[entry.target.id];
           if (videoElement) {
             if (entry.isIntersecting) {
-              videoElement.play().catch(error => console.error("Video autoplay failed:", error));
+              videoElement.play().catch((error) =>
+                console.error("Video autoplay failed:", error)
+              );
             } else {
               videoElement.pause();
               videoElement.currentTime = 0;
@@ -150,21 +87,21 @@ export default function Mywork() {
       { threshold: 0.7 }
     );
 
-    Object.values(videoRefs.current).forEach((videoEl) => {
+    Object.values(currentRefs).forEach((videoEl) => {
       if (videoEl) {
         observer.observe(videoEl);
       }
     });
 
     return () => {
-      Object.values(videoRefs.current).forEach((videoEl) => {
+      Object.values(currentRefs).forEach((videoEl) => {
         if (videoEl) {
           observer.unobserve(videoEl);
         }
       });
       observer.disconnect();
     };
-  }, [galleryItems]);
+  }, []); // ✅ No galleryItems
 
   return (
     <section className="px-4 py-8 bg-white">
@@ -181,8 +118,7 @@ export default function Mywork() {
           {galleryItems.map((item) => (
             <div
               key={item.id}
-              className="mb-4 bg-white rounded-lg shadow-md overflow-hidden
-                         transition-all duration-300 ease-in-out hover:scale-[1.02] cursor-pointer group"
+              className="mb-4 bg-white rounded-lg shadow-md overflow-hidden transition-all duration-300 ease-in-out hover:scale-[1.02] cursor-pointer group"
               onClick={() => openZoom(item)}
             >
               <div
@@ -232,8 +168,7 @@ export default function Mywork() {
           >
             <button
               onClick={closeZoom}
-              className="absolute top-2 right-2 text-white bg-gray-800 rounded-full p-2
-                            hover:bg-gray-700 transition-colors z-50 text-opacity-80 hover:text-opacity-100"
+              className="absolute top-2 right-2 text-white bg-gray-800 rounded-full p-2 hover:bg-gray-700 transition-colors z-50 text-opacity-80 hover:text-opacity-100"
               aria-label="Close media view"
             >
               <XCircle size={36} />
@@ -244,7 +179,9 @@ export default function Mywork() {
               style={{
                 maxWidth: zoomedItem.type === 'image' ? '100%' : 'auto',
                 maxHeight: '100%',
-                aspectRatio: zoomedItem.aspectRatio ? `${zoomedItem.aspectRatio.split('/')[0]} / ${zoomedItem.aspectRatio.split('/')[1]}` : 'auto',
+                aspectRatio: zoomedItem.aspectRatio
+                  ? `${zoomedItem.aspectRatio.split('/')[0]} / ${zoomedItem.aspectRatio.split('/')[1]}`
+                  : 'auto',
               }}
             >
               {zoomedItem.type === 'image' ? (
