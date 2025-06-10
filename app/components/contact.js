@@ -86,7 +86,7 @@ const ContactSection = () => {
                 value={formData.name}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 text-sm sm:text-base caret-green-700 animate-caret"
+                className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 text-sm sm:text-base caret-green-700 blink-caret"
                 placeholder="Your Name"
               />
             </motion.div>
@@ -108,7 +108,7 @@ const ContactSection = () => {
                 value={formData.contactNumber}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 text-sm sm:text-base caret-green-700 animate-caret"
+                className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 text-sm sm:text-base caret-green-700 blink-caret"
                 placeholder="+1234567890"
               />
             </motion.div>
@@ -130,12 +130,12 @@ const ContactSection = () => {
                 onChange={handleChange}
                 rows="4"
                 required
-                className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 text-sm sm:text-base resize-y caret-green-700 animate-caret"
+                className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 text-sm sm:text-base resize-y caret-green-700 blink-caret"
                 placeholder="Tell us about your furniture needs..."
               ></textarea>
             </motion.div>
 
-            {/* Submit Button */}
+            {/* Submit */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -156,7 +156,7 @@ const ContactSection = () => {
             {/* Status */}
             {submissionStatus === 'success' && (
               <p className="text-center text-green-700 font-medium mt-4">
-                Message sent successfully! We'll be in touch soon.
+                Message sent successfully! We&apos;ll be in touch soon.
               </p>
             )}
             {submissionStatus === 'error' && (
