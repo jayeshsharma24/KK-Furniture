@@ -108,7 +108,7 @@ const Footer = () => {
                 {section.charAt(0).toUpperCase() + section.slice(1)}
               </h3>
               <ul
-                className={`space-y-2 text-gray-700 text-xs transition-all duration-300 ease-in-out overflow-hidden ${
+                className={`space-y-2 text-gray-700  text-xs transition-all duration-300 ease-in-out overflow-hidden ${
                   openAccordion === section
                     ? 'max-h-40 opacity-100'
                     : 'max-h-0 opacity-0 md:max-h-full md:opacity-100'

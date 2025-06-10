@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import Image from 'next/image';
 import { XCircle } from 'lucide-react';
 import Masonry from 'react-masonry-css';
+import { motion, useAnimation, useInView } from 'framer-motion';
 
 const galleryItems = [
   { id: 1, type: 'image', src: '/work3.jpg', aspectRatio: '16/9' },
@@ -27,9 +28,41 @@ const breakpointCols = {
   640: 2,
 };
 
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.6,
+      ease: "easeOut"
+    }
+  }
+};
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+      delayChildren: 0.2
+    }
+  }
+};
+
 export default function Mywork() {
   const [zoomedItem, setZoomedItem] = useState(null);
   const videoRefs = useRef({});
+  const controls = useAnimation();
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, amount: 0.1 });
+
+  useEffect(() => {
+    if (isInView) {
+      controls.start("visible");
+    }
+  }, [isInView, controls]);
 
   const openZoom = useCallback((item) => {
     setZoomedItem(item);
@@ -66,7 +99,7 @@ export default function Mywork() {
   }, [zoomedItem, closeZoom]);
 
   useEffect(() => {
-    const currentRefs = { ...videoRefs.current }; // ✅ Snapshot
+    const currentRefs = { ...videoRefs.current };
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -101,70 +134,91 @@ export default function Mywork() {
       });
       observer.disconnect();
     };
-  }, []); // ✅ No galleryItems
+  }, []);
 
   return (
-    <section className="px-4 py-8 bg-white">
-      <h2 className="text-center text-3xl sm:text-4xl md:text-5xl font-bold mb-12 text-gray-800">
+    <section className="px-4 py-8 bg-white" ref={ref}>
+      <motion.h2 
+        className="text-center text-3xl sm:text-4xl md:text-5xl font-bold mb-12 text-gray-800"
+        initial={{ opacity: 0, y: 20 }}
+        animate={controls}
+        transition={{ duration: 0.6 }}
+      >
         Our Visual Inspirations
-      </h2>
+      </motion.h2>
 
       <div className="mx-auto max-w-7xl">
-        <Masonry
-          breakpointCols={breakpointCols}
-          className="flex w-auto -ml-4"
-          columnClassName="pl-4 bg-clip-padding"
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate={controls}
         >
-          {galleryItems.map((item) => (
-            <div
-              key={item.id}
-              className="mb-4 bg-white rounded-lg shadow-md overflow-hidden transition-all duration-300 ease-in-out hover:scale-[1.02] cursor-pointer group"
-              onClick={() => openZoom(item)}
-            >
-              <div
-                className="relative w-full overflow-hidden bg-gray-100"
-                style={{
-                  paddingTop: item.aspectRatio
-                    ? `calc(100% / (${item.aspectRatio.split('/')[0]} / ${item.aspectRatio.split('/')[1]}))`
-                    : '75%',
-                }}
+          <Masonry
+            breakpointCols={breakpointCols}
+            className="flex w-auto -ml-4"
+            columnClassName="pl-4 bg-clip-padding"
+          >
+            {galleryItems.map((item, index) => (
+              <motion.div
+                key={item.id}
+                variants={itemVariants}
+                className="mb-4 bg-white rounded-lg shadow-md overflow-hidden transition-all duration-300 ease-in-out hover:scale-[1.02] cursor-pointer group"
+                onClick={() => openZoom(item)}
+                custom={index}
               >
-                {item.type === 'image' ? (
-                  <Image
-                    src={item.src}
-                    alt={`Gallery item ${item.id}`}
-                    fill
-                    className="object-cover transition-opacity duration-300 group-hover:opacity-85"
-                    sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                    priority={item.id <= 4}
-                  />
-                ) : (
-                  <video
-                    id={`video-${item.id}`}
-                    ref={(el) => (videoRefs.current[`video-${item.id}`] = el)}
-                    src={item.src}
-                    controls={false}
-                    loop
-                    muted
-                    playsInline
-                    preload="metadata"
-                    className="absolute inset-0 w-full h-full object-cover transition-opacity duration-300 group-hover:opacity-85"
-                  />
-                )}
-              </div>
-            </div>
-          ))}
-        </Masonry>
+                <div
+                  className="relative w-full overflow-hidden bg-gray-100"
+                  style={{
+                    paddingTop: item.aspectRatio
+                      ? `calc(100% / (${item.aspectRatio.split('/')[0]} / ${item.aspectRatio.split('/')[1]}))`
+                      : '75%',
+                  }}
+                >
+                  {item.type === 'image' ? (
+                    <Image
+                      src={item.src}
+                      alt={`Gallery item ${item.id}`}
+                      fill
+                      className="object-cover transition-opacity duration-300 group-hover:opacity-85"
+                      sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                      priority={item.id <= 4}
+                    />
+                  ) : (
+                    <video
+                      id={`video-${item.id}`}
+                      ref={(el) => (videoRefs.current[`video-${item.id}`] = el)}
+                      src={item.src}
+                      controls={false}
+                      loop
+                      muted
+                      playsInline
+                      preload="metadata"
+                      className="absolute inset-0 w-full h-full object-cover transition-opacity duration-300 group-hover:opacity-85"
+                    />
+                  )}
+                </div>
+              </motion.div>
+            ))}
+          </Masonry>
+        </motion.div>
       </div>
 
       {zoomedItem && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-[200] p-2 sm:p-4 animate-fadeIn"
+        <motion.div
+          className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-[200] p-2 sm:p-4"
           onClick={closeZoom}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.3 }}
         >
-          <div
-            className="relative bg-transparent backdrop-blur-md rounded-lg max-w-full max-h-[95vh] w-full h-full flex flex-col animate-zoomIn"
+          <motion.div
+            className="relative bg-transparent backdrop-blur-md rounded-lg max-w-full max-h-[95vh] w-full h-full flex flex-col"
             onClick={(e) => e.stopPropagation()}
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.9, opacity: 0 }}
+            transition={{ duration: 0.3 }}
           >
             <button
               onClick={closeZoom}
@@ -203,8 +257,8 @@ export default function Mywork() {
                 />
               )}
             </div>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       )}
     </section>
   );
